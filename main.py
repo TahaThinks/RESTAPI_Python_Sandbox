@@ -2,7 +2,7 @@ from flask import Flask, jsonify, render_template, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
-
+from sqlalchemy.sql.expression import func
 app = Flask(__name__)
 
 
@@ -44,7 +44,8 @@ def home():
 # HTTP GET - Read Record
 @app.route("/random")
 def random():
-    return "<h1>This is a random Cafe</h1>"
+    random_cafe = Cafe.query.order_by(func.random()).first()
+    return f"<h1>{random_cafe.name}</h1>"
 
 
 # HTTP POST - Create Record
