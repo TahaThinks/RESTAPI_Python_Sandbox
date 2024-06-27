@@ -42,6 +42,10 @@ def home():
 
 
 # HTTP GET - Read Record
+@app.route("/random")
+def random():
+    return "<h1>This is a random Cafe</h1>"
+
 
 # HTTP POST - Create Record
 
