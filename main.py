@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Boolean
 from sqlalchemy.sql.expression import func
+
 app = Flask(__name__)
 
 
@@ -36,6 +37,21 @@ with app.app_context():
     db.create_all()
 
 
+def data_jsonify(cafe):
+    return jsonify( Cafe={
+        "id": cafe.id,
+        "name": cafe.name,
+        "map_url": cafe.map_url,
+        "img_url": cafe.img_url,
+        "location": cafe.location,
+        "seats": cafe.seats,
+        "has_toilet": cafe.has_toilet,
+        "has_wifi": cafe.has_wifi,
+        "has_sockets": cafe.has_sockets,
+        "can_take_calls": cafe.can_take_calls,
+        "coffee_price": cafe.coffee_price,
+    })
+
 @app.route("/")
 def home():
     return render_template("index.html")
@@ -45,7 +61,8 @@ def home():
 @app.route("/random")
 def random():
     random_cafe = Cafe.query.order_by(func.random()).first()
-    return f"<h1>{random_cafe.name}</h1>"
+    json_data = data_jsonify(random_cafe)
+    return json_data
 
 
 # HTTP POST - Create Record
