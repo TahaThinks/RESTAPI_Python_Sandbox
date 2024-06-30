@@ -32,25 +32,21 @@ class Cafe(db.Model):
     can_take_calls: Mapped[bool] = mapped_column(Boolean, nullable=False)
     coffee_price: Mapped[str] = mapped_column(String(250), nullable=True)
 
+    def to_dict(self):
+        # Method 1.
+        dictionary = {}
+        # Loop through each column in the data record
+        for column in self.__table__.columns:
+            # Create a new dictionary entry;
+            # where the key is the name of the column
+            # and the value is the value of the column
+            dictionary[column.name] = getattr(self, column.name)
+        return dictionary
+
 
 with app.app_context():
     db.create_all()
 
-
-def data_jsonify(cafe):
-    return jsonify( Cafe={
-        "id": cafe.id,
-        "name": cafe.name,
-        "map_url": cafe.map_url,
-        "img_url": cafe.img_url,
-        "location": cafe.location,
-        "seats": cafe.seats,
-        "has_toilet": cafe.has_toilet,
-        "has_wifi": cafe.has_wifi,
-        "has_sockets": cafe.has_sockets,
-        "can_take_calls": cafe.can_take_calls,
-        "coffee_price": cafe.coffee_price,
-    })
 
 @app.route("/")
 def home():
@@ -61,8 +57,18 @@ def home():
 @app.route("/random")
 def random():
     random_cafe = Cafe.query.order_by(func.random()).first()
-    json_data = data_jsonify(random_cafe)
+    json_data = Cafe.to_dict(random_cafe)
+    print(json_data)
     return json_data
+
+
+@app.route("/all")
+def all_cafe():
+    all_cafes = Cafe.query.all()
+    list_of_cafes = []
+    for cafes in all_cafes:
+        list_of_cafes.append(cafes.to_dict())
+    return jsonify(cafes_info=list_of_cafes)
 
 
 # HTTP POST - Create Record
